@@ -8,38 +8,26 @@ import {
     Calldata,
     DeployableOP_20,
     OP20InitParameters,
+    ABIDataTypes,
 } from '@btc-vision/btc-runtime/runtime';
-
-// To generate the following Uint8Array value, run generateUint8ArrayValues.ts
-const maxSupplyUint8Array: Uint8Array = new Uint8Array(32);
-
-maxSupplyUint8Array.set(
-    [
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x3b, 0x2e, 0x3c, 0x9f, 0xd0, 0x80, 0x3c, 0xe8, 0x00,
-        0x00, 0x00,
-    ],
-    0,
-);
 
 @final
 export class MyToken extends DeployableOP_20 {
     public constructor() {
         super();
-
         // IMPORTANT. THIS WILL RUN EVERYTIME THE CONTRACT IS INTERACTED WITH. FOR SPECIFIC INITIALIZATION, USE "onDeployment" METHOD.
     }
 
     // "solidityLikeConstructor" This is a solidity-like constructor. This method will only run once when the contract is deployed.
     public override onDeployment(_calldata: Calldata): void {
-        const maxSupply: u256 = u256.fromUint8ArrayBE(maxSupplyUint8Array); // Your max supply.
-        const decimals: u8 = 18; // Your decimals.
-        const name: string = 'Test'; // Your token name.
-        const symbol: string = 'TEST'; // Your token symbol.
+        const decimals: u8 = 18;
+        const maxSupply: u256 = u256.fromUint(1_000_000).mul(u256.exp10(decimals)); // 1 million tokens with 18 decimals
+        const name: string = 'CryptoManiaUA';
+        const symbol: string = 'CMUA';
 
         this.instantiate(new OP20InitParameters(maxSupply, decimals, name, symbol));
 
-        // Add your logic here. Eg, minting the initial supply:
+        // Mint the initial supply to the deployer
         this._mint(Blockchain.tx.origin, maxSupply);
     }
 
